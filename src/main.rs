@@ -37,6 +37,7 @@ async fn presigned_url(data: web::Data<AppState>) -> HttpResponse {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    let dotenv_stackupload_ip_string = dotenv::var("STACKUPLOAD_IP_STRING").unwrap();
     HttpServer::new(|| {
         App::new()
             .data(AppState {
@@ -44,7 +45,7 @@ async fn main() -> std::io::Result<()> {
             })
             .service(presigned_url)
     })
-    .bind("127.0.0.1:3030")?
+    .bind(dotenv_stackupload_ip_string)?
     .run()
     .await
 }
