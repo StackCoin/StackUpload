@@ -17,6 +17,7 @@ pub fn put_presigned_url_with_uuid(bucket: &Bucket, expire_secs: u32) -> Result<
 pub fn connect_bucket() -> Result<Bucket, S3Error> {
     let dotenv_stackupload_region = dotenv::var("STACKUPLOAD_REGION").unwrap();
     let dotenv_stackupload_endpoint = dotenv::var("STACKUPLOAD_ENDPOINT").unwrap();
+    let dotenv_stackupload_bucket = dotenv::var("STACKUPLOAD_BUCKET").unwrap();
     let credentials = Credentials::from_env_specific(
         Some("S3_ACCESS_KEY_ID"),
         Some("S3_SECRET_ACCESS_KEY"),
@@ -29,7 +30,7 @@ pub fn connect_bucket() -> Result<Bucket, S3Error> {
             endpoint: dotenv_stackupload_endpoint,
         },
         credentials,
-        bucket: "stackmarket".to_string(),
+        bucket: dotenv_stackupload_bucket,
     };
 
     Ok(Bucket::new(
