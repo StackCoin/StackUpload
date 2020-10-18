@@ -19,10 +19,10 @@ pub fn connect_bucket() -> Result<Bucket, S3Error> {
         endpoint: dotenv_stackupload_endpoint,
     };
     let credentials = Credentials::from_env_specific(
-        Some("S3_ACCESS_KEY_ID"),
-        Some("S3_SECRET_ACCESS_KEY"),
-        None,
-        None,
+        Some("S3_ACCESS_KEY"),
+        Some("S3_SECRET_KEY"),
+        Some("S3_SECURITY_TOKEN"),
+        Some("S3_SESSION_TOKEN"),
     )?;
 
     if dotenv_stackupload_url_style == "path" {
