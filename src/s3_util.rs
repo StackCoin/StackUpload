@@ -26,8 +26,8 @@ pub fn connect_bucket() -> Result<Bucket, S3Error> {
     )?;
 
     if dotenv_stackupload_url_style == "path" {
-        Bucket::new(&dotenv_stackupload_bucket, region, credentials)
-    } else {
         Bucket::new_with_path_style(&dotenv_stackupload_bucket, region, credentials)
+    } else {
+        Bucket::new(&dotenv_stackupload_bucket, region, credentials)
     }
 }
