@@ -32,16 +32,13 @@ pub fn connect_bucket() -> Result<Bucket, S3Error> {
     let dotenv_stackupload_bucket = get_dotenv_var_expect("STACKUPLOAD_BUCKET");
     let dotenv_stackupload_url_style =
         dotenv::var("STACKUPLOAD_URL_STYLE").unwrap_or("path".to_owned());
+
     let region = Region::Custom {
         region: dotenv_stackupload_region,
         endpoint: dotenv_stackupload_endpoint,
     };
-    let credentials = Credentials::from_env_specific(
-        Some("S3_ACCESS_KEY"),
-        Some("S3_SECRET_KEY"),
-        Some("S3_SECURITY_TOKEN"),
-        Some("S3_SESSION_TOKEN"),
-    )?;
+    let credentials =
+        Credentials::from_env_specific(Some("S3_ACCESS_KEY"), Some("S3_SECRET_KEY"), None, None)?;
 
     if dotenv_stackupload_url_style == "path" {
         Bucket::new_with_path_style(&dotenv_stackupload_bucket, region, credentials)
