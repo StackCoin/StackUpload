@@ -27,7 +27,7 @@ impl ToHttp for S3Error {
     }
 }
 
-#[get("/presigned_url")]
+#[get("/")]
 async fn presigned_url(data: web::Data<AppState>) -> HttpResponse {
     match put_presigned_url_with_uuid(&data.bucket, PRESIGN_EXPIRE_SECS) {
         Ok(url) => url.to_http(),
@@ -37,7 +37,7 @@ async fn presigned_url(data: web::Data<AppState>) -> HttpResponse {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let dotenv_stackupload_ip_string = dotenv::var("STACKUPLOAD_IP_STRING").unwrap();
+    let dotenv_stackupload_ip_string = s3_util::get_dotenv_var_expect("STACKUPLOAD_IP_STRING");
     HttpServer::new(|| {
         App::new()
             .data(AppState {
