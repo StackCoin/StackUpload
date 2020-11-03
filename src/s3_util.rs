@@ -6,18 +6,35 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Debug)]
-struct PresignedURLResponse {
+struct PresignedPutURLResponse {
     #[serde(rename(serialize = "specialName"))]
     special_name: String,
     #[serde(rename(serialize = "uploadURL"))]
     upload_url: String,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+struct PresignedGetURLResponse {
+    #[serde(rename(serialize = "getUrl"))]
+    get_url: String,
+}
+
 pub fn put_presigned_url_with_uuid(bucket: &Bucket, expire_secs: u32) -> Result<String, S3Error> {
     let name = Uuid::new_v4().to_simple().to_string();
-    Ok(serde_json::to_string(&PresignedURLResponse {
+    Ok(serde_json::to_string(&PresignedPutURLResponse {
         special_name: name.to_owned(),
         upload_url: bucket.presign_put(name.to_owned(), expire_secs)?,
+    })
+    .expect("Incorrect response input"))
+}
+
+pub fn get_presigned_url_with_uuid(
+    bucket: &Bucket,
+    expire_secs: u32,
+    name: String,
+) -> Result<String, S3Error> {
+    Ok(serde_json::to_string(&PresignedGetURLResponse {
+        get_url: bucket.presign_get(name.to_owned(), expire_secs)?,
     })
     .expect("Incorrect response input"))
 }

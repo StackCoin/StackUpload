@@ -3,7 +3,7 @@ mod s3_util;
 use actix_web::{get, web, App, HttpResponse, HttpServer};
 use s3::bucket::Bucket;
 use s3::S3Error;
-use s3_util::put_presigned_url_with_uuid;
+use s3_util::{get_presigned_url_with_uuid, put_presigned_url_with_uuid};
 
 const PRESIGN_EXPIRE_SECS: u32 = 300;
 
@@ -27,9 +27,20 @@ impl ToHttp for S3Error {
     }
 }
 
-#[get("/")]
-async fn presigned_url(data: web::Data<AppState>) -> HttpResponse {
+#[get("url/put")]
+async fn put_presigned_url(data: web::Data<AppState>) -> HttpResponse {
     match put_presigned_url_with_uuid(&data.bucket, PRESIGN_EXPIRE_SECS) {
+        Ok(url) => url.to_http(),
+        Err(error) => error.to_http(),
+    }
+}
+
+#[get("url/get/{name}")]
+async fn get_presigned_url(
+    data: web::Data<AppState>,
+    web::Path(name): web::Path<String>,
+) -> HttpResponse {
+    match get_presigned_url_with_uuid(&data.bucket, PRESIGN_EXPIRE_SECS, name) {
         Ok(url) => url.to_http(),
         Err(error) => error.to_http(),
     }
@@ -43,7 +54,8 @@ async fn main() -> std::io::Result<()> {
             .data(AppState {
                 bucket: s3_util::connect_bucket().unwrap(),
             })
-            .service(presigned_url)
+            .service(put_presigned_url)
+            .service(get_presigned_url)
     })
     .bind(dotenv_stackupload_ip_string)?
     .run()
